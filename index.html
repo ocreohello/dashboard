@@ -6,7 +6,7 @@
 <title>OCREO 일정 한눈에</title>
 <!--
   디자인 시스템: ~/ocreo/DESIGN.md ("OCREO Status") — 블랙 + 블루 2색, 주황은 임박 신호에만.
-  일정 데이터는 아래 스크립트의 UPCOMING · MONTHS · STATUS · FAIRS 를 고치면 됩니다. 오늘 날짜와 D-day는 접속한 날 기준으로 자동 계산.
+  일정 데이터는 아래 스크립트의 UPCOMING · MONTHS · STATUS · FAIRS · OPEN_MANUAL(오픈 현황 중 admin 에 없는 값) 를 고치면 됩니다. 오늘 날짜와 D-day는 접속한 날 기준으로 자동 계산.
   <section id="briefing"> 은 일요일 자동 갱신(scripts/collect.py)이 찾는 자리이므로 id 를 바꾸지 마세요.
 -->
 <link href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css" rel="stylesheet">
@@ -155,6 +155,44 @@
   .fair .row span { color: var(--sub); font-size: 13px; display: inline-block; width: 34px; }
   .fair .pay { margin-top: 8px; font-size: 13px; color: var(--navy); background: var(--blue-soft); border-radius: 8px; padding: 6px 10px; }
 
+
+  /* 페어별 오픈 현황 (claude.ai 「페어별 오픈 현황 보드」를 옮김 — 상태는 OPEN_FAIRS 배열에서 고침) */
+  .ob-lead { font-size: 14px; color: var(--sub); margin: -8px 0 16px; }
+  .ob-sub { font-size: 14px; font-weight: 800; color: var(--sub); margin: 0 0 8px; }
+  .ob-strip { list-style: none; margin: 0 0 22px; padding: 2px 2px 8px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; }
+  .ob-strip li { flex: 0 0 250px; scroll-snap-align: start; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; background: #fff; }
+  .ob-strip li.late { border: 2px solid var(--urgent); background: var(--urgent-soft); }
+  .ob-strip li.ob-empty { flex: 1 1 auto; text-align: center; color: var(--sub); }
+  .ob-when { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ob-when b { font-size: 14px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+  .ob-when span { font-size: 12px; font-weight: 700; color: var(--sub); white-space: nowrap; }
+  .ob-when span.soon { color: var(--blue); }
+  .ob-when span.late { color: var(--urgent); }
+  .ob-what { font-size: 14px; color: var(--text); line-height: 1.45; margin-top: 4px; overflow-wrap: anywhere; }
+  .ob-what b { color: var(--ink); }
+  .ob-what small { color: var(--sub); font-size: 12px; margin-left: 4px; }
+  .ob-tag { display: table; font-size: 12px; font-weight: 800; color: var(--navy); background: var(--blue-soft); border-radius: 6px; padding: 1px 7px; margin-bottom: 4px; }
+  .ob-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--sub); margin: 0 0 12px; }
+  .ob-table-wrap { border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; }
+  .ob-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 680px; }
+  .ob-table th, .ob-table td { padding: 12px 16px; text-align: left; vertical-align: middle; border-bottom: 1px solid #F1F5F9; font-size: 14px; }
+  .ob-table tbody tr:last-child td { border-bottom: 0; }
+  .ob-table thead th { background: var(--bg); vertical-align: top; }
+  .ob-table .ob-rh { position: sticky; left: 0; background: #fff; z-index: 1; white-space: nowrap; font-weight: 800; color: var(--ink); width: 140px; }
+  .ob-table thead .ob-rh { background: var(--bg); color: var(--sub); }
+  .ob-table tr.ob-group td { background: #F8FAFC; font-size: 12px; font-weight: 800; color: var(--sub); padding: 8px 16px; }
+  .ob-fn { font-size: 15px; font-weight: 800; color: var(--ink); }
+  .ob-fd { font-size: 12px; font-weight: 700; color: var(--sub); }
+  .ob-st { display: inline-block; font-size: 12px; font-weight: 800; border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+  .ob-open { background: var(--blue); color: #fff; }
+  .ob-closed { background: #E2E8F0; color: var(--sub); }
+  .ob-hidden { background: #fff; color: var(--sub); border: 1px solid #CBD5E1; }
+  .ob-check { background: var(--urgent-soft); color: var(--urgent); border: 1px solid #FDBA74; }
+  .ob-unset { background: #fff; color: var(--muted); border: 1px dashed #CBD5E1; }
+  .ob-warn { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--urgent); margin-left: 6px; vertical-align: 1px; cursor: help; }
+  .ob-rec { display: block; font-size: 12px; color: var(--sub); margin-top: 4px; white-space: nowrap; }
+  .ob-memo { font-size: 13px; color: var(--text); }
+
   footer { text-align: center; font-size: 13px; color: var(--muted); margin-top: 8px; }
 
   @media (max-width: 960px) {
@@ -266,6 +304,19 @@
   <section class="card" id="fairs">
     <h2>페어별 지금 단계</h2>
     <div class="fairs" id="fairGrid"></div>
+  </section>
+
+  <!-- 7. 페어별 오픈 현황 (참가신청·페이지 노출) -->
+  <section class="card" id="open-board">
+    <h2>페어별 오픈 현황</h2>
+    <p class="ob-lead">참가신청과 페이지 노출 상태입니다. <b id="obSrc" style="color:#1E3A8A">불러오는 중…</b><br>추천 일정은 지난 페어 운영 기록(지라·노션) 평균으로 계산했습니다. 상태 위에 마우스를 올리면 admin 설정값이 보입니다.</p>
+    <p class="ob-sub">다가오는 할 일 <span style="font-weight:400">(추천 일정)</span></p>
+    <ul class="ob-strip" id="obTodo"></ul>
+    <div class="ob-legend">
+      <span class="ob-st ob-open">오픈</span><span class="ob-st ob-closed">마감</span><span class="ob-st ob-hidden">미노출</span><span class="ob-st ob-check">확인 필요</span>
+      <span><i class="ob-warn" style="margin:0 4px 0 6px"></i>추천 일정이 지났는데 상태가 그대로</span>
+    </div>
+    <div class="ob-table-wrap"><table class="ob-table" id="obBoard"></table></div>
   </section>
 
   <footer>내용은 2026년 10월 12일에 업데이트했습니다. 날짜와 D-day는 접속한 날을 기준으로 계산됩니다.</footer>
@@ -416,6 +467,150 @@ document.getElementById('fairGrid').innerHTML = FAIRS.map(f => `
     <div class="row"><span>다음</span>${f.next}</div>
     <div class="pay">${f.pay}</div>
   </div>`).join('');
+
+// ===== 페어별 오픈 현황 =====
+// 상태는 admin 값을 불러옴: GitHub Actions(.github/workflows/open-status.yml)가 1시간마다
+// scripts/fetch_open_status.py 로 open-status.json 을 갱신하고, 이 페이지가 그 파일을 읽는다.
+//   신청 4종 = admin 신청 기간(Personal·Business·PersonalUSD·BusinessUSD) 안이면 오픈, 지나면 마감, 전이면 미노출
+//   페어스토리·참가자 리스트·바이어 등록 = admin 노출 스위치(켜짐 오픈 / 꺼짐 미노출)
+// admin 에 없는 값만 여기서 손으로 넣는다: 페어 종료일, 부스도면 상태(open·closed·hidden·check), 메모.
+const OPEN_MANUAL = {
+  B03: { end:'2026-11-08', booth_map:'', memo:'' },
+  S06: { end:'2026-12-27', booth_map:'', memo:'' },
+  G01: { end:'2027-03-14', booth_map:'', memo:'종료일 확인 전 (임시 3/14)' },
+  S07: { end:'2027-08-01', booth_map:'', memo:'' },
+};
+const OB_ITEMS = [
+  { key:'dom_solo', label:'국내 1인 작가', group:'apply', period:'Personal' },
+  { key:'dom_corp', label:'국내 기업',     group:'apply', period:'Business' },
+  { key:'ovs_solo', label:'해외 1인 작가', group:'apply', period:'PersonalUSD' },
+  { key:'ovs_corp', label:'해외 기업',     group:'apply', period:'BusinessUSD' },
+  { key:'story',        label:'페어스토리',   group:'page', flag:'story' },
+  { key:'participants', label:'참가자 리스트', group:'page', flag:'participants' },
+  { key:'booth_map',    label:'부스도면',     group:'page' },
+  { key:'buyer',        label:'바이어 등록',   group:'page', flag:'buyer' },
+];
+const OB_STATUS = { open:'오픈', closed:'마감', hidden:'미노출', check:'확인 필요' };
+// 추천 기간: 지난 페어(지라·노션) 운영 기록 평균. 기준 = 페어 시작일(start) / 종료일(end), 숫자는 일수
+const OB_APPLY_OPEN = [['서일',-330],['부일',-280]];
+const OB_RULES = {
+  apply:        { from:'apply', to:['start',-20], toNote:'부스 소진 시' },
+  buyer:        { from:['start',-70], to:['end',0] },
+  story:        { from:['start',-60], to:['end',3] },
+  participants: { from:['start',-65], to:['end',3] },
+  booth_map:    { from:['start',-25], to:['end',3] },
+};
+const OB_SHORT = { SIF:(v) => `서일페 ${v}회차`, BIF:(v) => `부일페 V.${v}`, GIF:(v) => `고일페 V.${v}` };
+const obD = (iso) => new Date(iso + 'T00:00:00');
+const obAdd = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const obISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const obKST = (utc) => new Date(new Date(utc).getTime() + 9 * 3600000).toISOString().slice(0, 10);
+const obFmt = (d) => `${d.getMonth() + 1}/${d.getDate()}(${WD[d.getDay()]})`;
+const obFmtY = (d) => (d.getFullYear() !== today.getFullYear() ? String(d.getFullYear()).slice(2) + '.' : '') + obFmt(d);
+const obKFmt = (utc) => { const k = new Date(new Date(utc).getTime() + 9 * 3600000);
+  return `${String(k.getUTCFullYear()).slice(2)}.${k.getUTCMonth() + 1}.${k.getUTCDate()} ${pad(k.getUTCHours())}:${pad(k.getUTCMinutes())}`; };
+
+function obFromApi(a) {
+  const m = OPEN_MANUAL[a.code] || {};
+  const start = obKST(a.fairStartAt);
+  const f = { code:a.code, name:(OB_SHORT[a.type] || ((v) => a.name + ' ' + v))(a.version), start,
+    end: m.end || obISO(obAdd(obD(start), 3)), memo: m.memo || '', status:{}, tip:{} };
+  const now = Date.now();
+  OB_ITEMS.forEach(it => {
+    if (it.period) {
+      const p = a.periods[it.period];
+      if (!p) { f.status[it.key] = 'check'; f.tip[it.key] = 'admin 에 신청 기간이 없습니다'; return; }
+      const s = Date.parse(p[0]), e = Date.parse(p[1]);
+      f.tip[it.key] = `admin 신청 기간 ${obKFmt(p[0])} ~ ${obKFmt(p[1])}`;
+      f.status[it.key] = e < s ? 'check' : now < s ? 'hidden' : now > e ? 'closed' : 'open';
+      if (e < s) f.tip[it.key] += ' (종료가 시작보다 빠름)';
+    } else if (it.flag) {
+      f.status[it.key] = a[it.flag] ? 'open' : 'hidden';
+      f.tip[it.key] = `admin 노출 스위치 ${a[it.flag] ? '켜짐' : '꺼짐'}`;
+    } else {
+      f.status[it.key] = m[it.key] || '';
+      f.tip[it.key] = 'admin 에 값이 없어 직접 입력';
+    }
+  });
+  return f;
+}
+function obRec(f, g) {
+  const r = g.apply ? OB_RULES.apply : OB_RULES[g.gk]; if (!r) return null;
+  const S = obD(f.start), E = obD(f.end), at = ([b, n]) => obAdd(b === 'start' ? S : E, n);
+  let from;
+  if (r.from === 'apply') { const m = OB_APPLY_OPEN.find(([k]) => f.name.includes(k)); if (!m) return null; from = obAdd(S, m[1]); }
+  else from = at(r.from);
+  return { from, to: at(r.to), toNote: r.toNote || '' };
+}
+const OB_GROUPS = [{ gk:'apply', label:'참가신청', items:OB_ITEMS.filter(i => i.group === 'apply'), apply:true }]
+  .concat(OB_ITEMS.filter(i => i.group === 'page').map(i => ({ gk:i.key, label:i.label, items:[i] })));
+const OB_VERB = { open:'오픈', closed:'마감', hidden:'미노출 처리' };
+// 그룹별 남은 추천 작업 하나. 상태가 있으면 상태로 완료 여부 판단, 미입력이면 오늘 이후 날짜만.
+function obPending(f, g) {
+  const rec = obRec(f, g); if (!rec) return null;
+  const st = g.items.map(i => f.status[i.key]);
+  if (st.includes('check')) return null;
+  const closeTo = g.apply ? 'closed' : 'hidden';
+  if (st.some(x => !x)) {
+    if (today <= rec.from) return { date: rec.from, to: 'open' };
+    if (today <= rec.to) return { date: rec.to, to: closeTo };
+    return null;
+  }
+  // 신청은 부스 소진으로 일찍 마감될 수 있어 오픈 시작 이후 마감이면 완료, 페이지는 추천 종료일이 지나야 미노출 완료
+  const closeDone = st.every(x => x === closeTo) && today > (g.apply ? rec.from : rec.to);
+  const openDone = closeDone || st.every(x => x === 'open');
+  if (!openDone) return { date: rec.from, to: 'open' };
+  if (!closeDone) return { date: rec.to, to: closeTo };
+  return null;
+}
+function renderOpenBoard(list, src) {
+  list = list.filter(f => obD(f.end) >= today).sort((a, b) => a.start.localeCompare(b.start));
+  document.getElementById('obSrc').textContent = src;
+  const todos = [];
+  list.forEach(f => OB_GROUPS.forEach(g => { const a = obPending(f, g); if (a) todos.push({ f, g, ...a }); }));
+  todos.sort((a, b) => a.date - b.date);
+  const merged = [];
+  todos.forEach(x => { const m = merged.find(y => y.f === x.f && +y.date === +x.date && y.to === x.to && !(x.g.apply || y.g.apply));
+    if (m) m.label += ', ' + x.g.label; else merged.push({ ...x, label: x.g.label }); });
+  document.getElementById('obTodo').innerHTML = merged.length ? merged.map(x => {
+    const n = Math.round((x.date - today) / 86400000);
+    const r = n === 0 ? ['오늘', 'soon'] : n < 0 ? [(-n) + '일 지남', 'late'] : [n + '일 남음', n <= 7 ? 'soon' : ''];
+    const note = x.g.apply && x.to === 'closed' ? '<small>(부스 소진 시)</small>' : '';
+    return `<li class="${n < 0 ? 'late' : ''}"><div class="ob-when"><b>${obFmtY(x.date)}</b><span class="${r[1]}">${r[0]}</span></div>
+      <div class="ob-what"><span class="ob-tag">${x.f.name}</span>${x.label} <b>${OB_VERB[x.to]}</b>${note}</div></li>`;
+  }).join('') : '<li class="ob-empty">예정된 할 일이 없습니다.</li>';
+  if (!list.length) { document.getElementById('obBoard').innerHTML = '<tbody><tr><td class="ob-memo">표시할 페어가 없습니다.</td></tr></tbody>'; return; }
+  let h = '<thead><tr><th class="ob-rh">항목</th>' + list.map(f =>
+    `<th><div class="ob-fn">${f.name}</div><div class="ob-fd">${obFmtY(obD(f.start))} ~ ${obFmtY(obD(f.end))}</div></th>`).join('') + '</tr></thead><tbody>';
+  [['apply', '참가신청'], ['page', '페이지 노출']].forEach(([gid, gl]) => {
+    h += `<tr class="ob-group"><td class="ob-rh" style="background:#F8FAFC">${gl}</td>${list.map(() => '<td></td>').join('')}</tr>`;
+    OB_ITEMS.filter(i => i.group === gid).forEach(it => {
+      const g = OB_GROUPS.find(x => x.items.includes(it));
+      h += `<tr><td class="ob-rh">${it.label}</td>` + list.map(f => {
+        const v = f.status[it.key], tip = (f.tip[it.key] || '').replace(/"/g, '&quot;');
+        const pill = v ? `<span class="ob-st ob-${v}" title="${tip}">${OB_STATUS[v]}</span>` : `<span class="ob-st ob-unset" title="${tip}">미입력</span>`;
+        const a = v && obPending(f, g);
+        const warn = a && a.date <= today ? `<i class="ob-warn" title="추천 일정이 지났습니다: ${OB_VERB[a.to]}"></i>` : '';
+        const rec = it === g.items[0] && obRec(f, g);
+        const recTxt = rec ? `<span class="ob-rec">추천 ${obFmtY(rec.from)} ~ ${obFmtY(rec.to)}</span>` : '';
+        return `<td>${pill}${warn}${recTxt}</td>`;
+      }).join('') + '</tr>';
+    });
+  });
+  h += `<tr><td class="ob-rh">메모</td>${list.map(f => `<td class="ob-memo">${f.memo || '-'}</td>`).join('')}</tr></tbody>`;
+  document.getElementById('obBoard').innerHTML = h;
+}
+fetch('open-status.json', { cache: 'no-cache' })
+  .then(r => { if (!r.ok) throw new Error(r.status); const lm = r.headers.get('Last-Modified'); return r.json().then(j => [j, lm]); })
+  .then(([j, lm]) => {
+    const t = lm ? new Date(lm) : null;
+    const when = t ? `${t.getMonth() + 1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())} 마지막 변경` : '';
+    renderOpenBoard(j.fairs.map(obFromApi), `admin 값 · 1시간마다 확인${when ? ' · ' + when : ''}`);
+  })
+  .catch(() => {
+    document.getElementById('obSrc').textContent = 'admin 값을 불러오지 못했습니다 (파일을 직접 열면 브라우저가 막습니다 — 배포 주소에서 확인)';
+    document.getElementById('obTodo').innerHTML = '<li class="ob-empty">불러오지 못했습니다.</li>';
+  });
 </script>
 </body>
 </html>

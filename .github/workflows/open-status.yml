@@ -1,0 +1,30 @@
+name: 페어 오픈 현황(admin 값) 수집
+
+on:
+  schedule:
+    - cron: '7 * * * *'      # 매시 7분
+  workflow_dispatch: {}      # 수동 실행 버튼
+
+permissions:
+  contents: write
+
+concurrency:
+  group: open-status
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: admin 값 수집
+        run: python scripts/fetch_open_status.py
+      - name: 바뀐 경우만 커밋·배포
+        run: |
+          git config user.name "ocreo-bot"
+          git config user.email "actions@github.com"
+          git add open-status.json
+          git diff --cached --quiet && echo "변경 없음" || (git commit -m "페어 오픈 현황 자동 갱신 $(TZ=Asia/Seoul date '+%F %H:%M')" && git pull --rebase && git push)
