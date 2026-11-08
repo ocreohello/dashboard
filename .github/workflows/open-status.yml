@@ -1,8 +1,10 @@
 name: 페어 오픈 현황(admin 값) 수집
 
 on:
-  schedule:
-    - cron: '7 * * * *'      # 매시 7분
+  # 매시 실행은 꺼 둠 (2026-11-09): backend-api.ocreo.kr 이 GitHub 서버 접속을 403 으로 막음.
+  # 서버 CORS 에 ocreohello.github.io 가 허용되면 페이지가 직접 읽도록 바꾸고 이 워크플로는 지움.
+  # schedule:
+  #   - cron: '7 * * * *'      # 매시 7분
   workflow_dispatch: {}      # 수동 실행 버튼
 
 permissions:
