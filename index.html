@@ -292,13 +292,6 @@
       <li><b>첫 화면 개선 기획 회의 일정</b>
         <span class="why">9월에 하기로 했으나 아직 잡히지 않았습니다.</span></li>
     </ol>
-    <p class="sub-title" style="margin-top:18px">사무국 확인이 필요합니다</p>
-    <ol class="ask ask-ops">
-      <li><b>토스 상점관리자에서 취소한 결제는 어드민에 어떻게 정리하나요?</b>
-        <span class="why">상점관리자에서 취소해도 오크레오 어드민에는 반영되지 않습니다. 개발 요청을 할지, 사무국이 직접 정리할지 정해야 합니다.</span></li>
-      <li><b>고일페 V.1 종료일 확인</b>
-        <span class="why">지금은 3/14로 임시 입력해 두었습니다.</span></li>
-    </ol>
   </section>
 
   <!-- 5. 진행 현황 -->
@@ -342,7 +335,7 @@ const UPCOMING = [
   { from:'2026-12-10', label:'12/10 (목) 쯤',   what:'부대시설 본격 접수',       note:'22회차 · 수기', kind:'plain' },
   { from:'2026-12-24', to:'2026-12-27', label:'12/24 ~ 12/27', what:'서일페 22회차 행사', note:'부대시설 · 정산은 수기', kind:'event' },
   { from:'2027-01-29', label:'1/29 (금)',       what:'서일페 V.23 결제 구간 전환', note:'이날부터 잔금은 가상계좌', kind:'ref' },
-  { from:'2027-03-12', to:'2027-03-14', label:'3/12 ~ 3/14', what:'고일페 V.1 행사', note:'종료일 확인 전', kind:'event' },
+  { from:'2027-03-12', to:'2027-03-14', label:'3/12 ~ 3/14', what:'고일페 V.1 행사', note:'3일간', kind:'event' },
 ];
 
 // ===== 월별 일정 =====
@@ -485,7 +478,7 @@ document.getElementById('fairGrid').innerHTML = FAIRS.map(f => `
 const OPEN_MANUAL = {
   B03: { end:'2026-11-08', booth_map:'', memo:'' },
   S06: { end:'2026-12-27', booth_map:'', memo:'' },
-  G01: { end:'2027-03-14', booth_map:'', memo:'종료일 확인 전 (임시 3/14)' },
+  G01: { end:'2027-03-14', booth_map:'', memo:'' },
   S07: { end:'2027-08-01', booth_map:'', memo:'' },
 };
 const OB_ITEMS = [
