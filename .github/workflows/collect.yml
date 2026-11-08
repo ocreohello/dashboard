@@ -22,7 +22,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          PAGES_URL: https://yejinshin95-jpg.github.io/ocreo-dashboard/
+          PAGES_URL: https://ocreohello.github.io/dashboard/
         run: python scripts/collect.py
       - name: 변경분 커밋·배포
         run: |
