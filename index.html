@@ -602,11 +602,18 @@ function renderOpenBoard(list, src) {
   document.getElementById('obBoard').innerHTML = h;
 }
 fetch('open-status.json', { cache: 'no-cache' })
-  .then(r => { if (!r.ok) throw new Error(r.status); const lm = r.headers.get('Last-Modified'); return r.json().then(j => [j, lm]); })
-  .then(([j, lm]) => {
-    const t = lm ? new Date(lm) : null;
-    const when = t ? `${t.getMonth() + 1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())} 마지막 변경` : '';
-    renderOpenBoard(j.fairs.map(obFromApi), `admin 값 · 1시간마다 확인${when ? ' · ' + when : ''}`);
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(j => {
+    renderOpenBoard(j.fairs.map(obFromApi), 'admin 값 · 1시간마다 확인');
+    // 마지막 변경 = open-status.json 이 마지막으로 커밋된 시각 (Pages 의 Last-Modified 는 페이지 배포 시각이라 쓰지 않음)
+    fetch('https://api.github.com/repos/ocreohello/dashboard/commits?path=open-status.json&per_page=1')
+      .then(r => r.ok ? r.json() : [])
+      .then(c => {
+        if (!c[0]) return;
+        const t = new Date(c[0].commit.committer.date);
+        document.getElementById('obSrc').textContent =
+          `admin 값 · 1시간마다 확인 · ${t.getMonth() + 1}/${t.getDate()} ${pad(t.getHours())}:${pad(t.getMinutes())} 마지막 변경`;
+      }).catch(() => {});
   })
   .catch(() => {
     document.getElementById('obSrc').textContent = 'admin 값을 불러오지 못했습니다 (파일을 직접 열면 브라우저가 막습니다 — 배포 주소에서 확인)';

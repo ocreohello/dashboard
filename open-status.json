@@ -47,7 +47,7 @@
    "type": "BIF",
    "fairStartAt": "2026-11-06T00:00:00.000Z",
    "story": true,
-   "buyer": true,
+   "buyer": false,
    "participants": true,
    "periods": {
     "Business": [
